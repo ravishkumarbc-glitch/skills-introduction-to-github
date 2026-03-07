@@ -1,0 +1,259 @@
+/* ---- Reset / Base ---- */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: #f4f6f9;
+  color: #1a1a2e;
+  min-height: 100vh;
+}
+
+a { color: #4361ee; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* ---- Navbar ---- */
+.navbar {
+  background: #1a1a2e;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 8px rgba(0,0,0,.25);
+}
+
+.navbar-brand {
+  color: #fff;
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: .5px;
+}
+.navbar-brand:hover { text-decoration: none; opacity: .85; }
+
+/* ---- Container ---- */
+.container {
+  max-width: 1000px;
+  margin: 2rem auto;
+  padding: 0 1.25rem;
+}
+
+/* ---- Alerts ---- */
+.alert {
+  border-radius: 8px;
+  padding: .75rem 1rem;
+  margin-bottom: 1rem;
+  font-size: .95rem;
+}
+.alert-success { background: #d1fae5; color: #065f46; border: 1px solid #6ee7b7; }
+.alert-danger  { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+
+/* ---- Page header ---- */
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+}
+.page-header h1 { font-size: 1.75rem; font-weight: 700; }
+.header-actions { display: flex; gap: .5rem; align-items: center; flex-shrink: 0; }
+.breadcrumb { font-size: .875rem; color: #6b7280; display: block; margin-bottom: .25rem; }
+.breadcrumb:hover { color: #4361ee; text-decoration: none; }
+
+/* ---- Buttons ---- */
+.btn {
+  display: inline-block;
+  padding: .5rem 1.1rem;
+  border-radius: 6px;
+  font-size: .9rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: opacity .15s, transform .1s;
+  white-space: nowrap;
+}
+.btn:hover { opacity: .88; text-decoration: none; }
+.btn:active { transform: scale(.97); }
+
+.btn-primary  { background: #4361ee; color: #fff; }
+.btn-secondary { background: #e5e7eb; color: #374151; }
+.btn-danger   { background: #ef4444; color: #fff; }
+.btn-sm { padding: .3rem .75rem; font-size: .82rem; }
+
+/* ---- Course grid ---- */
+.course-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.25rem;
+}
+
+.course-card {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: box-shadow .2s;
+}
+.course-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.15); }
+
+.course-card-body { padding: 1.25rem; flex: 1; }
+.course-card-footer {
+  padding: .75rem 1.25rem;
+  background: #f9fafb;
+  display: flex;
+  gap: .5rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.course-title { font-size: 1.1rem; margin: .4rem 0 .5rem; }
+.course-title a { color: #1a1a2e; }
+.course-title a:hover { color: #4361ee; text-decoration: none; }
+.course-desc { font-size: .9rem; color: #6b7280; margin-bottom: .75rem; line-height: 1.5; }
+.course-meta { font-size: .8rem; color: #9ca3af; }
+
+/* ---- Badge ---- */
+.badge {
+  display: inline-block;
+  background: #ede9fe;
+  color: #5b21b6;
+  padding: .15rem .55rem;
+  border-radius: 99px;
+  font-size: .78rem;
+  font-weight: 600;
+  letter-spacing: .3px;
+}
+
+/* ---- Empty state ---- */
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: #6b7280;
+}
+.empty-state p { font-size: 1.1rem; margin-bottom: 1rem; }
+
+/* ---- Form ---- */
+.form-card {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.1);
+  padding: 2rem;
+  max-width: 640px;
+}
+
+.form-group { margin-bottom: 1.25rem; }
+.form-group label {
+  display: block;
+  font-size: .9rem;
+  font-weight: 600;
+  margin-bottom: .4rem;
+  color: #374151;
+}
+.required { color: #ef4444; }
+
+.form-control {
+  width: 100%;
+  padding: .55rem .8rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: .95rem;
+  color: #1a1a2e;
+  background: #fff;
+  transition: border-color .15s;
+}
+.form-control:focus {
+  outline: none;
+  border-color: #4361ee;
+  box-shadow: 0 0 0 3px rgba(67,97,238,.15);
+}
+
+textarea.form-control { resize: vertical; line-height: 1.5; }
+
+.form-actions { display: flex; gap: .75rem; margin-top: 1.5rem; }
+
+/* ---- Course detail ---- */
+.course-description {
+  font-size: 1rem;
+  color: #4b5563;
+  margin-bottom: 2rem;
+  line-height: 1.6;
+}
+
+.section { margin-top: 2rem; }
+.section h2 { font-size: 1.2rem; margin-bottom: 1rem; }
+
+/* ---- Upload card ---- */
+.upload-card {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.1);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.upload-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: .4rem;
+  border: 2px dashed #d1d5db;
+  border-radius: 8px;
+  padding: 2rem 1rem;
+  cursor: pointer;
+  text-align: center;
+  transition: border-color .2s, background .2s;
+}
+.upload-area:hover, .upload-area.dragover {
+  border-color: #4361ee;
+  background: #eef2ff;
+}
+.upload-icon { font-size: 2rem; }
+.upload-label { font-size: .95rem; color: #374151; }
+.upload-hint { font-size: .8rem; color: #9ca3af; }
+.file-input { display: none; }
+
+.file-chosen {
+  margin: .75rem 0 0;
+  font-size: .9rem;
+  color: #065f46;
+  background: #d1fae5;
+  border-radius: 6px;
+  padding: .4rem .75rem;
+}
+.hidden { display: none; }
+
+.upload-btn { margin-top: 1rem; }
+
+/* ---- File table ---- */
+.file-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0,0,0,.1);
+}
+.file-table th, .file-table td {
+  padding: .75rem 1rem;
+  text-align: left;
+  font-size: .9rem;
+}
+.file-table th {
+  background: #f3f4f6;
+  font-weight: 600;
+  color: #374151;
+  border-bottom: 1px solid #e5e7eb;
+}
+.file-table td { border-bottom: 1px solid #f3f4f6; }
+.file-table tr:last-child td { border-bottom: none; }
+.file-table tr:hover td { background: #f9fafb; }
+
+.empty-files { color: #9ca3af; font-size: .9rem; padding: .5rem 0; }
+
+/* ---- Inline form ---- */
+.inline-form { display: inline; }
