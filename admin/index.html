@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Panel – EduCMS</title>
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+<div class="app-layout">
+
+  <!-- ===== Sidebar ===== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-brand-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+          <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+        </svg>
+      </div>
+      <div>
+        <div class="sidebar-brand-text">EduCMS</div>
+        <div class="sidebar-brand-sub">Admin Panel</div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-section-title">Main</div>
+        <button class="nav-link active" data-page="dashboard">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          Dashboard
+        </button>
+        <button class="nav-link" data-page="courses">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          Courses
+        </button>
+        <button class="nav-link" data-page="students">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Students
+        </button>
+        <button class="nav-link" data-page="grades">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          Grades
+        </button>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">Communication</div>
+        <button class="nav-link" data-page="announcements">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          Announcements
+        </button>
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar" id="admin-avatar">A</div>
+        <div>
+          <div class="user-name" id="admin-name">Admin</div>
+          <div class="user-role">Administrator</div>
+        </div>
+      </div>
+      <button class="btn btn-secondary btn-sm" id="logout-btn" style="width:100%; justify-content: center;">
+        Sign out
+      </button>
+    </div>
+  </aside>
+
+  <!-- ===== Main Content ===== -->
+  <div class="main-content">
+    <header class="topbar">
+      <div class="topbar-title" id="topbar-title">Dashboard</div>
+      <div style="font-size:12px;color:var(--text-muted);" id="topbar-date"></div>
+    </header>
+
+    <main class="page-content" id="page-content">
+      <!-- Pages rendered here via JS -->
+    </main>
+  </div>
+</div>
+
+<!-- ===== Course Modal ===== -->
+<div class="modal-overlay" id="course-modal">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="course-modal-title">
+    <div class="modal-header">
+      <span class="modal-title" id="course-modal-title">Add Course</span>
+      <button class="btn-icon" onclick="Utils.closeModal('course-modal')" aria-label="Close">✕</button>
+    </div>
+    <div class="modal-body">
+      <form id="course-form" novalidate>
+        <input type="hidden" id="course-id" />
+        <div class="form-group">
+          <label for="course-title">Title *</label>
+          <input type="text" id="course-title" required placeholder="e.g. Introduction to Python" />
+          <span class="error-msg" id="course-title-err"></span>
+        </div>
+        <div class="form-group">
+          <label for="course-category">Category *</label>
+          <select id="course-category">
+            <option value="">— Select category —</option>
+            <option>Technology</option>
+            <option>Data Science</option>
+            <option>Business</option>
+            <option>Arts &amp; Design</option>
+            <option>Science</option>
+            <option>Mathematics</option>
+            <option>Language</option>
+            <option>Other</option>
+          </select>
+          <span class="error-msg" id="course-category-err"></span>
+        </div>
+        <div class="form-group">
+          <label for="course-desc">Description</label>
+          <textarea id="course-desc" placeholder="Brief course description..."></textarea>
+        </div>
+        <div class="form-group">
+          <label for="course-status">Status</label>
+          <select id="course-status">
+            <option value="draft">Draft</option>
+            <option value="published">Published</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="course-color">Accent Color</label>
+          <input type="color" id="course-color" value="#1f6feb" style="height:40px;padding:4px;" />
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="Utils.closeModal('course-modal')">Cancel</button>
+      <button class="btn btn-primary" id="save-course-btn">Save Course</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Grade Modal ===== -->
+<div class="modal-overlay" id="grade-modal">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="grade-modal-title">
+    <div class="modal-header">
+      <span class="modal-title" id="grade-modal-title">Assign Grade</span>
+      <button class="btn-icon" onclick="Utils.closeModal('grade-modal')" aria-label="Close">✕</button>
+    </div>
+    <div class="modal-body">
+      <form id="grade-form" novalidate>
+        <input type="hidden" id="grade-enrollment-id" />
+        <div class="form-group">
+          <label>Student</label>
+          <input type="text" id="grade-student-name" disabled style="background:var(--bg)" />
+        </div>
+        <div class="form-group">
+          <label>Course</label>
+          <input type="text" id="grade-course-name" disabled style="background:var(--bg)" />
+        </div>
+        <div class="form-group">
+          <label for="grade-score">Score (0–100) *</label>
+          <input type="number" id="grade-score" min="0" max="100" placeholder="e.g. 85" />
+          <span class="error-msg" id="grade-score-err"></span>
+        </div>
+        <div class="form-group">
+          <label for="grade-letter">Letter Grade</label>
+          <select id="grade-letter">
+            <option>A+</option><option>A</option><option>A-</option>
+            <option>B+</option><option>B</option><option>B-</option>
+            <option>C+</option><option>C</option><option>C-</option>
+            <option>D</option><option>F</option>
+          </select>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="Utils.closeModal('grade-modal')">Cancel</button>
+      <button class="btn btn-primary" id="save-grade-btn">Save Grade</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Announcement Modal ===== -->
+<div class="modal-overlay" id="ann-modal">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="ann-modal-title">
+    <div class="modal-header">
+      <span class="modal-title" id="ann-modal-title">New Announcement</span>
+      <button class="btn-icon" onclick="Utils.closeModal('ann-modal')" aria-label="Close">✕</button>
+    </div>
+    <div class="modal-body">
+      <form id="ann-form" novalidate>
+        <input type="hidden" id="ann-id" />
+        <div class="form-group">
+          <label for="ann-title">Title *</label>
+          <input type="text" id="ann-title" placeholder="Announcement title" />
+          <span class="error-msg" id="ann-title-err"></span>
+        </div>
+        <div class="form-group">
+          <label for="ann-body">Message *</label>
+          <textarea id="ann-body" placeholder="Write your announcement..."></textarea>
+          <span class="error-msg" id="ann-body-err"></span>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="Utils.closeModal('ann-modal')">Cancel</button>
+      <button class="btn btn-primary" id="save-ann-btn">Publish</button>
+    </div>
+  </div>
+</div>
+
+<script src="../js/app.js"></script>
+<script>
+/* ===== Guard ===== */
+const session = Auth.requireRole('admin');
+document.getElementById('admin-name').textContent = session.name;
+document.getElementById('admin-avatar').textContent = Utils.getInitials(session.name);
+document.getElementById('topbar-date').textContent = new Date().toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+document.getElementById('logout-btn').addEventListener('click', () => { Auth.logout(); window.location.href = '../index.html'; });
+
+/* ===== Navigation ===== */
+let currentPage = 'dashboard';
+const navLinks = document.querySelectorAll('.nav-link[data-page]');
+navLinks.forEach(link => {
+  link.addEventListener('click', () => {
+    navigateTo(link.dataset.page);
+  });
+});
+
+function navigateTo(page) {
+  currentPage = page;
+  Utils.setActive(navLinks, page);
+  const titles = { dashboard: 'Dashboard', courses: 'Courses', students: 'Students', grades: 'Grades', announcements: 'Announcements' };
+  document.getElementById('topbar-title').textContent = titles[page] || page;
+  renderPage(page);
+}
+
+function renderPage(page) {
+  const el = document.getElementById('page-content');
+  switch (page) {
+    case 'dashboard':     el.innerHTML = renderDashboard(); break;
+    case 'courses':       el.innerHTML = renderCourses(); bindCoursePage(); break;
+    case 'students':      el.innerHTML = renderStudents(); break;
+    case 'grades':        el.innerHTML = renderGrades(); bindGradePage(); break;
+    case 'announcements': el.innerHTML = renderAnnouncements(); bindAnnPage(); break;
+    default:              el.innerHTML = '<p>Page not found.</p>';
+  }
+}
+
+/* ===== Dashboard ===== */
+function renderDashboard() {
+  const courses    = DB.get(DB.KEYS.COURSES) || [];
+  const users      = DB.get(DB.KEYS.USERS) || [];
+  const students   = users.filter(u => u.role === 'student');
+  const enrolls    = DB.get(DB.KEYS.ENROLLMENTS) || [];
+  const published  = courses.filter(c => c.status === 'published').length;
+
+  return `
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon blue">
+        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      </div>
+      <div><div class="stat-value">${courses.length}</div><div class="stat-label">Total Courses</div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon green">
+        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+      </div>
+      <div><div class="stat-value">${students.length}</div><div class="stat-label">Students</div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon purple">
+        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      </div>
+      <div><div class="stat-value">${enrolls.length}</div><div class="stat-label">Enrollments</div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon orange">
+        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
+      </div>
+      <div><div class="stat-value">${published}</div><div class="stat-label">Published Courses</div></div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+    <div class="card">
+      <div class="card-header">Recent Courses</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Title</th><th>Category</th><th>Status</th></tr></thead>
+          <tbody>
+            ${courses.slice(-4).reverse().map(c => `
+              <tr>
+                <td>${Utils.escapeHtml(c.title)}</td>
+                <td><span class="badge badge-secondary">${Utils.escapeHtml(c.category)}</span></td>
+                <td><span class="badge ${c.status === 'published' ? 'badge-success' : 'badge-warning'}">${c.status}</span></td>
+              </tr>
+            `).join('') || '<tr><td colspan="3" style="text-align:center;color:var(--text-muted)">No courses yet</td></tr>'}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">Recent Enrollments</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Student</th><th>Course</th><th>Progress</th></tr></thead>
+          <tbody>
+            ${enrolls.slice(-4).reverse().map(e => {
+              const u = (DB.get(DB.KEYS.USERS)||[]).find(x=>x.id===e.studentId);
+              const c = (DB.get(DB.KEYS.COURSES)||[]).find(x=>x.id===e.courseId);
+              return `<tr>
+                <td>${Utils.escapeHtml(u?.name||'—')}</td>
+                <td>${Utils.escapeHtml(c?.title||'—')}</td>
+                <td>
+                  <div style="display:flex;align-items:center;gap:8px;">
+                    <div class="progress-wrap" style="flex:1"><div class="progress-bar" style="width:${e.progress}%"></div></div>
+                    <span style="font-size:12px;color:var(--text-muted)">${e.progress}%</span>
+                  </div>
+                </td>
+              </tr>`;
+            }).join('') || '<tr><td colspan="3" style="text-align:center;color:var(--text-muted)">No enrollments yet</td></tr>'}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ===== Courses Page ===== */
+function renderCourses() {
+  const courses = DB.get(DB.KEYS.COURSES) || [];
+  return `
+  <div class="section-header">
+    <h2 class="section-title">Courses</h2>
+    <button class="btn btn-primary" id="add-course-btn">+ Add Course</button>
+  </div>
+  <div class="card">
+    <div class="table-wrap">
+      <table id="courses-table">
+        <thead><tr><th>Title</th><th>Category</th><th>Instructor</th><th>Status</th><th>Created</th><th>Actions</th></tr></thead>
+        <tbody>
+          ${courses.length ? courses.map(c => renderCourseRow(c)).join('') :
+            '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:40px">No courses found. Add your first course!</td></tr>'}
+        </tbody>
+      </table>
+    </div>
+  </div>`;
+}
+
+function renderCourseRow(c) {
+  return `<tr data-id="${Utils.escapeHtml(c.id)}">
+    <td>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="width:8px;height:8px;border-radius:50%;background:${Utils.escapeHtml(c.color)};flex-shrink:0;"></div>
+        <strong>${Utils.escapeHtml(c.title)}</strong>
+      </div>
+    </td>
+    <td><span class="badge badge-secondary">${Utils.escapeHtml(c.category)}</span></td>
+    <td>${Utils.escapeHtml(c.instructor)}</td>
+    <td><span class="badge ${c.status === 'published' ? 'badge-success' : 'badge-warning'}">${c.status}</span></td>
+    <td>${Utils.formatDate(c.createdAt)}</td>
+    <td>
+      <div style="display:flex;gap:6px;">
+        <button class="btn btn-secondary btn-sm edit-course" data-id="${Utils.escapeHtml(c.id)}">Edit</button>
+        <button class="btn btn-danger btn-sm delete-course" data-id="${Utils.escapeHtml(c.id)}">Delete</button>
+      </div>
+    </td>
+  </tr>`;
+}
+
+function bindCoursePage() {
+  document.getElementById('add-course-btn').addEventListener('click', () => openCourseModal());
+
+  document.getElementById('save-course-btn').addEventListener('click', saveCourse);
+
+  document.getElementById('courses-table').addEventListener('click', e => {
+    const editBtn   = e.target.closest('.edit-course');
+    const deleteBtn = e.target.closest('.delete-course');
+    if (editBtn)   openCourseModal(editBtn.dataset.id);
+    if (deleteBtn) deleteCourse(deleteBtn.dataset.id);
+  });
+}
+
+function openCourseModal(id = null) {
+  const form = document.getElementById('course-form');
+  form.reset();
+  document.getElementById('course-id').value = '';
+  document.getElementById('course-modal-title').textContent = id ? 'Edit Course' : 'Add Course';
+
+  if (id) {
+    const course = (DB.get(DB.KEYS.COURSES) || []).find(c => c.id === id);
+    if (course) {
+      document.getElementById('course-id').value      = course.id;
+      document.getElementById('course-title').value   = course.title;
+      document.getElementById('course-category').value = course.category;
+      document.getElementById('course-desc').value    = course.description;
+      document.getElementById('course-status').value  = course.status;
+      document.getElementById('course-color').value   = course.color;
+    }
+  }
+  clearCourseErrors();
+  Utils.openModal('course-modal');
+}
+
+function saveCourse() {
+  clearCourseErrors();
+  const title    = document.getElementById('course-title').value.trim();
+  const category = document.getElementById('course-category').value;
+  let valid = true;
+
+  if (!title)    { showErr('course-title-err', 'Title is required.');       document.getElementById('course-title').classList.add('input-error');    valid = false; }
+  if (!category) { showErr('course-category-err', 'Category is required.'); document.getElementById('course-category').classList.add('input-error'); valid = false; }
+  if (!valid) return;
+
+  const courses = DB.get(DB.KEYS.COURSES) || [];
+  const id      = document.getElementById('course-id').value;
+
+  const courseData = {
+    title,
+    category,
+    description: document.getElementById('course-desc').value.trim(),
+    status:      document.getElementById('course-status').value,
+    color:       document.getElementById('course-color').value,
+    instructor:  session.name,
+  };
+
+  if (id) {
+    const idx = courses.findIndex(c => c.id === id);
+    if (idx !== -1) courses[idx] = { ...courses[idx], ...courseData };
+    Utils.showToast('Course updated successfully!', 'success');
+  } else {
+    courses.push({ id: Utils.generateId(), createdAt: new Date().toISOString(), ...courseData });
+    Utils.showToast('Course added successfully!', 'success');
+  }
+
+  DB.set(DB.KEYS.COURSES, courses);
+  Utils.closeModal('course-modal');
+  navigateTo('courses');
+}
+
+function deleteCourse(id) {
+  if (!confirm('Delete this course? All enrollments and grades for it will also be removed.')) return;
+  let courses   = DB.get(DB.KEYS.COURSES) || [];
+  let enrolls   = DB.get(DB.KEYS.ENROLLMENTS) || [];
+  let grades    = DB.get(DB.KEYS.GRADES) || [];
+  courses       = courses.filter(c => c.id !== id);
+  enrolls       = enrolls.filter(e => e.courseId !== id);
+  grades        = grades.filter(g => g.courseId !== id);
+  DB.set(DB.KEYS.COURSES, courses);
+  DB.set(DB.KEYS.ENROLLMENTS, enrolls);
+  DB.set(DB.KEYS.GRADES, grades);
+  Utils.showToast('Course deleted.', 'info');
+  navigateTo('courses');
+}
+
+function clearCourseErrors() {
+  ['course-title', 'course-category'].forEach(f => {
+    const el = document.getElementById(f);
+    if (el) el.classList.remove('input-error');
+  });
+  ['course-title-err', 'course-category-err'].forEach(f => showErr(f, ''));
+}
+
+/* ===== Students Page ===== */
+function renderStudents() {
+  const users    = DB.get(DB.KEYS.USERS) || [];
+  const students = users.filter(u => u.role === 'student');
+  const enrolls  = DB.get(DB.KEYS.ENROLLMENTS) || [];
+  const courses  = DB.get(DB.KEYS.COURSES) || [];
+
+  return `
+  <div class="section-header">
+    <h2 class="section-title">Students</h2>
+    <span class="badge badge-secondary">${students.length} total</span>
+  </div>
+  <div class="card">
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Name</th><th>Email</th><th>Enrolled Courses</th><th>Avg Progress</th><th>Joined</th></tr></thead>
+        <tbody>
+          ${students.length ? students.map(s => {
+            const myEnrolls = enrolls.filter(e => e.studentId === s.id);
+            const avg = myEnrolls.length
+              ? Math.round(myEnrolls.reduce((a,b) => a + (b.progress||0), 0) / myEnrolls.length)
+              : 0;
+            const courseNames = myEnrolls.map(e => courses.find(c=>c.id===e.courseId)?.title||'—').join(', ') || '—';
+            return `<tr>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <div class="user-avatar" style="width:28px;height:28px;font-size:12px;">${Utils.escapeHtml(Utils.getInitials(s.name))}</div>
+                  <strong>${Utils.escapeHtml(s.name)}</strong>
+                </div>
+              </td>
+              <td>${Utils.escapeHtml(s.email)}</td>
+              <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${Utils.escapeHtml(courseNames)}">${Utils.escapeHtml(courseNames)}</td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px;min-width:100px;">
+                  <div class="progress-wrap" style="flex:1"><div class="progress-bar" style="width:${avg}%"></div></div>
+                  <span style="font-size:12px;color:var(--text-muted)">${avg}%</span>
+                </div>
+              </td>
+              <td>${Utils.formatDate(s.createdAt)}</td>
+            </tr>`;
+          }).join('') : '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:40px">No students registered.</td></tr>'}
+        </tbody>
+      </table>
+    </div>
+  </div>`;
+}
+
+/* ===== Grades Page ===== */
+function renderGrades() {
+  const enrolls = DB.get(DB.KEYS.ENROLLMENTS) || [];
+  const users   = DB.get(DB.KEYS.USERS) || [];
+  const courses = DB.get(DB.KEYS.COURSES) || [];
+  const grades  = DB.get(DB.KEYS.GRADES) || [];
+
+  return `
+  <div class="section-header">
+    <h2 class="section-title">Grade Management</h2>
+  </div>
+  <div class="card">
+    <div class="table-wrap">
+      <table id="grades-table">
+        <thead><tr><th>Student</th><th>Course</th><th>Progress</th><th>Grade</th><th>Score</th><th>Action</th></tr></thead>
+        <tbody>
+          ${enrolls.length ? enrolls.map(e => {
+            const student = users.find(u => u.id === e.studentId);
+            const course  = courses.find(c => c.id === e.courseId);
+            const grade   = grades.find(g => g.studentId === e.studentId && g.courseId === e.courseId);
+            return `<tr>
+              <td>${Utils.escapeHtml(student?.name||'—')}</td>
+              <td>${Utils.escapeHtml(course?.title||'—')}</td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px;min-width:100px;">
+                  <div class="progress-wrap" style="flex:1"><div class="progress-bar" style="width:${e.progress}%"></div></div>
+                  <span style="font-size:12px;color:var(--text-muted)">${e.progress}%</span>
+                </div>
+              </td>
+              <td>${grade ? `<span class="badge badge-success">${Utils.escapeHtml(grade.grade)}</span>` : '<span class="badge badge-secondary">—</span>'}</td>
+              <td>${grade ? grade.score : '—'}</td>
+              <td><button class="btn btn-primary btn-sm assign-grade"
+                    data-eid="${Utils.escapeHtml(e.id)}"
+                    data-sid="${Utils.escapeHtml(e.studentId)}"
+                    data-cid="${Utils.escapeHtml(e.courseId)}"
+                    data-sname="${Utils.escapeHtml(student?.name||'')}"
+                    data-cname="${Utils.escapeHtml(course?.title||'')}">
+                    ${grade ? 'Update' : 'Assign'} Grade
+                  </button></td>
+            </tr>`;
+          }).join('') : '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:40px">No enrollments yet.</td></tr>'}
+        </tbody>
+      </table>
+    </div>
+  </div>`;
+}
+
+function bindGradePage() {
+  document.getElementById('grades-table').addEventListener('click', e => {
+    const btn = e.target.closest('.assign-grade');
+    if (!btn) return;
+    document.getElementById('grade-enrollment-id').value  = btn.dataset.eid;
+    document.getElementById('grade-student-name').value   = btn.dataset.sname;
+    document.getElementById('grade-course-name').value    = btn.dataset.cname;
+
+    const grades = DB.get(DB.KEYS.GRADES) || [];
+    const existing = grades.find(g => g.studentId === btn.dataset.sid && g.courseId === btn.dataset.cid);
+    document.getElementById('grade-score').value  = existing?.score  || '';
+    document.getElementById('grade-letter').value = existing?.grade  || 'A';
+
+    // stash student/course ids on save button
+    const saveBtn = document.getElementById('save-grade-btn');
+    saveBtn.dataset.sid = btn.dataset.sid;
+    saveBtn.dataset.cid = btn.dataset.cid;
+    Utils.openModal('grade-modal');
+  });
+
+  document.getElementById('save-grade-btn').addEventListener('click', saveGrade);
+}
+
+function saveGrade() {
+  const score  = parseInt(document.getElementById('grade-score').value, 10);
+  const letter = document.getElementById('grade-letter').value;
+  const sid    = document.getElementById('save-grade-btn').dataset.sid;
+  const cid    = document.getElementById('save-grade-btn').dataset.cid;
+
+  document.getElementById('grade-score-err').textContent = '';
+  document.getElementById('grade-score').classList.remove('input-error');
+
+  if (isNaN(score) || score < 0 || score > 100) {
+    document.getElementById('grade-score-err').textContent = 'Enter a score between 0 and 100.';
+    document.getElementById('grade-score').classList.add('input-error');
+    return;
+  }
+
+  const grades = DB.get(DB.KEYS.GRADES) || [];
+  const idx    = grades.findIndex(g => g.studentId === sid && g.courseId === cid);
+  const entry  = { id: Utils.generateId(), studentId: sid, courseId: cid, grade: letter, score, gradedAt: new Date().toISOString() };
+
+  if (idx !== -1) grades[idx] = entry;
+  else grades.push(entry);
+
+  DB.set(DB.KEYS.GRADES, grades);
+  Utils.closeModal('grade-modal');
+  Utils.showToast('Grade saved!', 'success');
+  navigateTo('grades');
+}
+
+/* ===== Announcements Page ===== */
+function renderAnnouncements() {
+  const anns = DB.get(DB.KEYS.ANNOUNCEMENTS) || [];
+  return `
+  <div class="section-header">
+    <h2 class="section-title">Announcements</h2>
+    <button class="btn btn-primary" id="add-ann-btn">+ New Announcement</button>
+  </div>
+  <div id="ann-list" style="display:flex;flex-direction:column;gap:12px;">
+    ${anns.length ? [...anns].reverse().map(a => renderAnnCard(a)).join('') :
+      `<div class="empty-state card card-body">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <h3>No announcements yet</h3><p>Create your first announcement for students.</p>
+      </div>`}
+  </div>`;
+}
+
+function renderAnnCard(a) {
+  return `<div class="card" data-ann-id="${Utils.escapeHtml(a.id)}">
+    <div class="card-header">
+      <span>${Utils.escapeHtml(a.title)}</span>
+      <div style="display:flex;gap:6px;align-items:center;">
+        <span style="font-size:12px;color:var(--text-muted)">${Utils.formatDate(a.createdAt)}</span>
+        <button class="btn btn-secondary btn-sm edit-ann" data-id="${Utils.escapeHtml(a.id)}">Edit</button>
+        <button class="btn btn-danger btn-sm delete-ann" data-id="${Utils.escapeHtml(a.id)}">Delete</button>
+      </div>
+    </div>
+    <div class="card-body" style="color:var(--text-muted)">${Utils.escapeHtml(a.body)}</div>
+  </div>`;
+}
+
+function bindAnnPage() {
+  document.getElementById('add-ann-btn').addEventListener('click', () => openAnnModal());
+  document.getElementById('save-ann-btn').addEventListener('click', saveAnn);
+
+  document.getElementById('ann-list').addEventListener('click', e => {
+    const editBtn   = e.target.closest('.edit-ann');
+    const deleteBtn = e.target.closest('.delete-ann');
+    if (editBtn)   openAnnModal(editBtn.dataset.id);
+    if (deleteBtn) deleteAnn(deleteBtn.dataset.id);
+  });
+}
+
+function openAnnModal(id = null) {
+  document.getElementById('ann-id').value    = '';
+  document.getElementById('ann-title').value = '';
+  document.getElementById('ann-body').value  = '';
+  document.getElementById('ann-modal-title').textContent = id ? 'Edit Announcement' : 'New Announcement';
+
+  if (id) {
+    const ann = (DB.get(DB.KEYS.ANNOUNCEMENTS) || []).find(a => a.id === id);
+    if (ann) {
+      document.getElementById('ann-id').value    = ann.id;
+      document.getElementById('ann-title').value = ann.title;
+      document.getElementById('ann-body').value  = ann.body;
+    }
+  }
+  Utils.openModal('ann-modal');
+}
+
+function saveAnn() {
+  const id    = document.getElementById('ann-id').value;
+  const title = document.getElementById('ann-title').value.trim();
+  const body  = document.getElementById('ann-body').value.trim();
+
+  ['ann-title-err','ann-body-err'].forEach(e => showErr(e, ''));
+  ['ann-title','ann-body'].forEach(f => document.getElementById(f).classList.remove('input-error'));
+
+  let valid = true;
+  if (!title) { showErr('ann-title-err','Title is required.'); document.getElementById('ann-title').classList.add('input-error'); valid = false; }
+  if (!body)  { showErr('ann-body-err','Message is required.'); document.getElementById('ann-body').classList.add('input-error'); valid = false; }
+  if (!valid) return;
+
+  const anns = DB.get(DB.KEYS.ANNOUNCEMENTS) || [];
+  if (id) {
+    const idx = anns.findIndex(a => a.id === id);
+    if (idx !== -1) anns[idx] = { ...anns[idx], title, body };
+    Utils.showToast('Announcement updated!', 'success');
+  } else {
+    anns.push({ id: Utils.generateId(), title, body, author: session.name, createdAt: new Date().toISOString() });
+    Utils.showToast('Announcement published!', 'success');
+  }
+
+  DB.set(DB.KEYS.ANNOUNCEMENTS, anns);
+  Utils.closeModal('ann-modal');
+  navigateTo('announcements');
+}
+
+function deleteAnn(id) {
+  if (!confirm('Delete this announcement?')) return;
+  const anns = (DB.get(DB.KEYS.ANNOUNCEMENTS) || []).filter(a => a.id !== id);
+  DB.set(DB.KEYS.ANNOUNCEMENTS, anns);
+  Utils.showToast('Announcement deleted.', 'info');
+  navigateTo('announcements');
+}
+
+/* ===== Helpers ===== */
+function showErr(id, msg) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = msg;
+}
+
+/* ===== Init ===== */
+renderPage('dashboard');
+</script>
+</body>
+</html>

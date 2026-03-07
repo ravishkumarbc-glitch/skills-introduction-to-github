@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student Panel – EduCMS</title>
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+<div class="app-layout">
+
+  <!-- ===== Sidebar ===== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-brand-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+          <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+        </svg>
+      </div>
+      <div>
+        <div class="sidebar-brand-text">EduCMS</div>
+        <div class="sidebar-brand-sub">Student Portal</div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-section-title">Main</div>
+        <button class="nav-link active" data-page="dashboard">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          Dashboard
+        </button>
+        <button class="nav-link" data-page="courses">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          My Courses
+        </button>
+        <button class="nav-link" data-page="catalog">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          Course Catalog
+        </button>
+        <button class="nav-link" data-page="grades">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          My Grades
+        </button>
+        <button class="nav-link" data-page="announcements">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          Announcements
+        </button>
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar" id="student-avatar">S</div>
+        <div>
+          <div class="user-name" id="student-name">Student</div>
+          <div class="user-role">Student</div>
+        </div>
+      </div>
+      <button class="btn btn-secondary btn-sm" id="logout-btn" style="width:100%; justify-content: center;">
+        Sign out
+      </button>
+    </div>
+  </aside>
+
+  <!-- ===== Main Content ===== -->
+  <div class="main-content">
+    <header class="topbar">
+      <div class="topbar-title" id="topbar-title">Dashboard</div>
+      <div style="font-size:12px;color:var(--text-muted);" id="topbar-date"></div>
+    </header>
+
+    <main class="page-content" id="page-content">
+      <!-- Pages rendered here via JS -->
+    </main>
+  </div>
+</div>
+
+<!-- ===== Course Detail Modal ===== -->
+<div class="modal-overlay" id="course-detail-modal">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="course-detail-title" style="max-width:600px;">
+    <div class="modal-header">
+      <span class="modal-title" id="course-detail-title">Course Details</span>
+      <button class="btn-icon" onclick="Utils.closeModal('course-detail-modal')" aria-label="Close">✕</button>
+    </div>
+    <div class="modal-body" id="course-detail-body">
+      <!-- Rendered dynamically -->
+    </div>
+    <div class="modal-footer" id="course-detail-footer">
+      <button class="btn btn-secondary" onclick="Utils.closeModal('course-detail-modal')">Close</button>
+    </div>
+  </div>
+</div>
+
+<script src="../js/app.js"></script>
+<script>
+/* ===== Guard ===== */
+const session = Auth.requireRole('student');
+document.getElementById('student-name').textContent   = session.name;
+document.getElementById('student-avatar').textContent = Utils.getInitials(session.name);
+document.getElementById('topbar-date').textContent    = new Date().toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+document.getElementById('logout-btn').addEventListener('click', () => { Auth.logout(); window.location.href = '../index.html'; });
+
+/* ===== Navigation ===== */
+const navLinks = document.querySelectorAll('.nav-link[data-page]');
+navLinks.forEach(link => link.addEventListener('click', () => navigateTo(link.dataset.page)));
+
+function navigateTo(page) {
+  Utils.setActive(navLinks, page);
+  const titles = { dashboard: 'Dashboard', courses: 'My Courses', catalog: 'Course Catalog', grades: 'My Grades', announcements: 'Announcements' };
+  document.getElementById('topbar-title').textContent = titles[page] || page;
+  const el = document.getElementById('page-content');
+  switch (page) {
+    case 'dashboard':     el.innerHTML = renderDashboard(); bindDashboard(); break;
+    case 'courses':       el.innerHTML = renderMyCourses(); bindMyCourses(); break;
+    case 'catalog':       el.innerHTML = renderCatalog();   bindCatalog();   break;
+    case 'grades':        el.innerHTML = renderGrades();    break;
+    case 'announcements': el.innerHTML = renderAnnouncements(); break;
+    default:              el.innerHTML = '<p>Page not found.</p>';
+  }
+}
+
+/* ===== Helpers ===== */
+function myEnrollments() {
+  return (DB.get(DB.KEYS.ENROLLMENTS) || []).filter(e => e.studentId === session.userId);
+}
+
+function allPublishedCourses() {
+  return (DB.get(DB.KEYS.COURSES) || []).filter(c => c.status === 'published');
+}
+
+/* ===== Dashboard ===== */
+function renderDashboard() {
+  const enrolls     = myEnrollments();
+  const courses     = DB.get(DB.KEYS.COURSES) || [];
+  const grades      = (DB.get(DB.KEYS.GRADES) || []).filter(g => g.studentId === session.userId);
+  const avgProgress = enrolls.length
+    ? Math.round(enrolls.reduce((a,b) => a + (b.progress||0), 0) / enrolls.length)
+    : 0;
+
+  const recent = enrolls.slice(-3).reverse().map(e => {
+    const c = courses.find(x => x.id === e.courseId);
+    return c ? { enroll: e, course: c } : null;
+  }).filter(Boolean);
+
+  const anns = (DB.get(DB.KEYS.ANNOUNCEMENTS) || []).slice(-3).reverse();
+
+  return `
+  <p style="margin-bottom:20px;color:var(--text-muted)">Welcome back, <strong>${Utils.escapeHtml(session.name)}</strong>! Here's your learning overview.</p>
+
+  <div class="stats-grid" style="grid-template-columns:repeat(auto-fit,minmax(160px,1fr))">
+    <div class="stat-card">
+      <div class="stat-icon blue"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
+      <div><div class="stat-value">${enrolls.length}</div><div class="stat-label">Enrolled</div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon green"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
+      <div><div class="stat-value">${grades.length}</div><div class="stat-label">Grades Received</div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon purple"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+      <div><div class="stat-value">${avgProgress}%</div><div class="stat-label">Avg Progress</div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon orange"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div>
+      <div><div class="stat-value">${(DB.get(DB.KEYS.ANNOUNCEMENTS)||[]).length}</div><div class="stat-label">Announcements</div></div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:2fr 1fr;gap:16px;">
+    <div class="card">
+      <div class="card-header">
+        Continue Learning
+        <button class="btn btn-secondary btn-sm" onclick="navigateTo('courses')">View All</button>
+      </div>
+      <div class="card-body" style="display:flex;flex-direction:column;gap:16px;">
+        ${recent.length ? recent.map(({ enroll: e, course: c }) => `
+          <div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+              <div>
+                <div style="font-weight:600">${Utils.escapeHtml(c.title)}</div>
+                <div style="font-size:12px;color:var(--text-muted)">${Utils.escapeHtml(c.category)}</div>
+              </div>
+              <button class="btn btn-primary btn-sm view-course-dash" data-cid="${Utils.escapeHtml(c.id)}" data-eid="${Utils.escapeHtml(e.id)}">Continue</button>
+            </div>
+            <div class="progress-wrap">
+              <div class="progress-bar" style="width:${e.progress}%;background:${Utils.escapeHtml(c.color||'var(--primary)')}"></div>
+            </div>
+            <div style="font-size:12px;color:var(--text-muted);margin-top:4px;">${e.progress}% complete</div>
+          </div>
+        `).join('') : '<p style="color:var(--text-muted);text-align:center;padding:20px 0">You are not enrolled in any courses. <a href="#" onclick="navigateTo(\'catalog\');return false;">Browse the catalog!</a></p>'}
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        Latest Announcements
+        <button class="btn btn-secondary btn-sm" onclick="navigateTo('announcements')">All</button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:0;">
+        ${anns.length ? anns.map(a => `
+          <div style="padding:12px 16px;border-bottom:1px solid var(--border)">
+            <div style="font-weight:600;font-size:13px">${Utils.escapeHtml(a.title)}</div>
+            <div style="font-size:12px;color:var(--text-muted);margin-top:2px">${Utils.formatDate(a.createdAt)}</div>
+          </div>
+        `).join('') : '<div style="padding:20px;color:var(--text-muted);text-align:center">No announcements.</div>'}
+      </div>
+    </div>
+  </div>`;
+}
+
+function bindDashboard() {
+  document.querySelectorAll('.view-course-dash').forEach(btn => {
+    btn.addEventListener('click', () => openCourseDetail(btn.dataset.cid, btn.dataset.eid));
+  });
+}
+
+/* ===== My Courses ===== */
+function renderMyCourses() {
+  const enrolls = myEnrollments();
+  const courses  = DB.get(DB.KEYS.COURSES) || [];
+  const grades   = (DB.get(DB.KEYS.GRADES) || []).filter(g => g.studentId === session.userId);
+
+  if (!enrolls.length) {
+    return `<div class="section-header"><h2 class="section-title">My Courses</h2></div>
+    <div class="card card-body empty-state">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      <h3>No courses enrolled</h3>
+      <p>Explore the course catalog and enroll in courses.</p>
+      <button class="btn btn-primary" style="margin-top:12px" onclick="navigateTo('catalog')">Browse Catalog</button>
+    </div>`;
+  }
+
+  return `
+  <div class="section-header">
+    <h2 class="section-title">My Courses</h2>
+    <span class="badge badge-secondary">${enrolls.length} enrolled</span>
+  </div>
+  <div class="content-grid" id="my-courses-grid">
+    ${enrolls.map(e => {
+      const c = courses.find(x => x.id === e.courseId);
+      if (!c) return '';
+      const grade = grades.find(g => g.courseId === c.id);
+      return `<div class="course-card">
+        <div class="course-card-header" style="background:${Utils.escapeHtml(c.color||'#1f6feb')}"></div>
+        <div class="course-card-body">
+          <div class="course-card-title">${Utils.escapeHtml(c.title)}</div>
+          <div class="course-card-desc">${Utils.escapeHtml(c.description||'')}</div>
+          <div class="course-card-meta">
+            <span class="badge badge-secondary">${Utils.escapeHtml(c.category)}</span>
+            ${grade ? `<span class="badge badge-success">${Utils.escapeHtml(grade.grade)} (${grade.score})</span>` : ''}
+          </div>
+          <div class="progress-wrap" style="margin-top:10px">
+            <div class="progress-bar" style="width:${e.progress}%;background:${Utils.escapeHtml(c.color||'var(--primary)')}"></div>
+          </div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:4px;">${e.progress}% complete</div>
+          <div class="course-card-actions">
+            <button class="btn btn-primary btn-sm continue-course"
+              data-cid="${Utils.escapeHtml(c.id)}"
+              data-eid="${Utils.escapeHtml(e.id)}">Continue</button>
+            <button class="btn btn-danger btn-sm unenroll-course"
+              data-eid="${Utils.escapeHtml(e.id)}"
+              data-cname="${Utils.escapeHtml(c.title)}">Unenroll</button>
+          </div>
+        </div>
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
+function bindMyCourses() {
+  const grid = document.getElementById('my-courses-grid');
+  if (!grid) return;
+  grid.addEventListener('click', e => {
+    const contBtn   = e.target.closest('.continue-course');
+    const unenrollBtn = e.target.closest('.unenroll-course');
+    if (contBtn)    openCourseDetail(contBtn.dataset.cid, contBtn.dataset.eid);
+    if (unenrollBtn) unenrollCourse(unenrollBtn.dataset.eid, unenrollBtn.dataset.cname);
+  });
+}
+
+function unenrollCourse(enrollId, courseName) {
+  if (!confirm(`Unenroll from "${courseName}"? Your progress and any grades for this course will be lost.`)) return;
+  const enrolls = (DB.get(DB.KEYS.ENROLLMENTS) || []).filter(e => e.id !== enrollId);
+  // Also remove the enrollment record reference used for grade look-ups
+  const enroll = (DB.get(DB.KEYS.ENROLLMENTS) || []).find(e => e.id === enrollId);
+  DB.set(DB.KEYS.ENROLLMENTS, enrolls);
+  if (enroll) {
+    const grades = (DB.get(DB.KEYS.GRADES) || []).filter(
+      g => !(g.studentId === enroll.studentId && g.courseId === enroll.courseId)
+    );
+    DB.set(DB.KEYS.GRADES, grades);
+  }
+  Utils.showToast('Unenrolled successfully.', 'info');
+  navigateTo('courses');
+}
+
+/* ===== Course Catalog ===== */
+function renderCatalog() {
+  const courses   = allPublishedCourses();
+  const enrollIds = myEnrollments().map(e => e.courseId);
+
+  return `
+  <div class="section-header">
+    <h2 class="section-title">Course Catalog</h2>
+    <div class="search-box">
+      <svg class="search-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="search" id="catalog-search" placeholder="Search courses..." />
+    </div>
+  </div>
+  <div class="content-grid" id="catalog-grid">
+    ${courses.length ? courses.map(c => renderCatalogCard(c, enrollIds.includes(c.id))).join('') :
+      '<div class="empty-state"><h3>No courses available</h3><p>Check back later.</p></div>'}
+  </div>`;
+}
+
+function renderCatalogCard(c, enrolled) {
+  return `<div class="course-card" data-cid="${Utils.escapeHtml(c.id)}">
+    <div class="course-card-header" style="background:${Utils.escapeHtml(c.color||'#1f6feb')}"></div>
+    <div class="course-card-body">
+      <div class="course-card-title">${Utils.escapeHtml(c.title)}</div>
+      <div class="course-card-desc">${Utils.escapeHtml(c.description||'')}</div>
+      <div class="course-card-meta">
+        <span class="badge badge-secondary">${Utils.escapeHtml(c.category)}</span>
+        <span style="font-size:12px;color:var(--text-muted)">${Utils.escapeHtml(c.instructor||'')}</span>
+      </div>
+      <div class="course-card-actions">
+        ${enrolled
+          ? `<span class="badge badge-success" style="padding:7px 12px;">✓ Enrolled</span>
+             <button class="btn btn-secondary btn-sm view-catalog-course" data-cid="${Utils.escapeHtml(c.id)}">View</button>`
+          : `<button class="btn btn-primary btn-sm enroll-course" data-cid="${Utils.escapeHtml(c.id)}">Enroll</button>
+             <button class="btn btn-secondary btn-sm view-catalog-course" data-cid="${Utils.escapeHtml(c.id)}">Details</button>`
+        }
+      </div>
+    </div>
+  </div>`;
+}
+
+function bindCatalog() {
+  const grid = document.getElementById('catalog-grid');
+
+  document.getElementById('catalog-search').addEventListener('input', function() {
+    const q = this.value.toLowerCase();
+    const courses = allPublishedCourses().filter(c =>
+      c.title.toLowerCase().includes(q) ||
+      c.category.toLowerCase().includes(q) ||
+      (c.description||'').toLowerCase().includes(q)
+    );
+    const enrollIds = myEnrollments().map(e => e.courseId);
+    grid.innerHTML = courses.length
+      ? courses.map(c => renderCatalogCard(c, enrollIds.includes(c.id))).join('')
+      : '<div class="empty-state"><h3>No courses match</h3></div>';
+  });
+
+  grid.addEventListener('click', e => {
+    const enrollBtn = e.target.closest('.enroll-course');
+    const viewBtn   = e.target.closest('.view-catalog-course');
+    if (enrollBtn) enrollCourse(enrollBtn.dataset.cid);
+    if (viewBtn)   openCourseDetail(viewBtn.dataset.cid, null);
+  });
+}
+
+function enrollCourse(courseId) {
+  const enrolls = DB.get(DB.KEYS.ENROLLMENTS) || [];
+  const already = enrolls.find(e => e.studentId === session.userId && e.courseId === courseId);
+  if (already) { Utils.showToast('Already enrolled!', 'info'); return; }
+  enrolls.push({ id: Utils.generateId(), studentId: session.userId, courseId, enrolledAt: new Date().toISOString(), progress: 0 });
+  DB.set(DB.KEYS.ENROLLMENTS, enrolls);
+  Utils.showToast('Enrolled successfully! 🎉', 'success');
+  navigateTo('catalog');
+}
+
+/* ===== Course Detail Modal ===== */
+function openCourseDetail(courseId, enrollId) {
+  const course  = (DB.get(DB.KEYS.COURSES) || []).find(c => c.id === courseId);
+  if (!course) return;
+
+  const enroll = enrollId
+    ? (DB.get(DB.KEYS.ENROLLMENTS) || []).find(e => e.id === enrollId)
+    : (DB.get(DB.KEYS.ENROLLMENTS) || []).find(e => e.studentId === session.userId && e.courseId === courseId);
+
+  document.getElementById('course-detail-title').textContent = course.title;
+  document.getElementById('course-detail-body').innerHTML = `
+    <div style="margin-bottom:16px;">
+      <div style="height:6px;border-radius:4px;background:${Utils.escapeHtml(course.color||'#1f6feb')};margin-bottom:16px;"></div>
+      <span class="badge badge-secondary">${Utils.escapeHtml(course.category)}</span>
+      <span style="margin-left:8px;font-size:13px;color:var(--text-muted)">Instructor: ${Utils.escapeHtml(course.instructor||'—')}</span>
+    </div>
+    <p style="color:var(--text-muted);margin-bottom:20px;">${Utils.escapeHtml(course.description||'No description provided.')}</p>
+    ${enroll ? `
+      <div style="margin-bottom:16px;">
+        <label style="font-weight:600;margin-bottom:8px;display:block;">Your Progress</label>
+        <div class="progress-wrap" style="height:10px;"><div class="progress-bar" id="modal-progress-bar" style="width:${enroll.progress}%;background:${Utils.escapeHtml(course.color||'var(--primary)')}"></div></div>
+        <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:13px;color:var(--text-muted)">
+          <span id="progress-pct-label">${enroll.progress}% complete</span>
+          <span>Enrolled ${Utils.formatDate(enroll.enrolledAt)}</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="progress-slider">Update Progress</label>
+        <input type="range" id="progress-slider" min="0" max="100" value="${enroll.progress}" style="width:100%;" />
+        <span id="progress-slider-val" style="font-size:13px;color:var(--text-muted)">${enroll.progress}%</span>
+      </div>
+    ` : '<p class="alert alert-info">Enroll in this course to start tracking your progress.</p>'}
+  `;
+
+  const footer = document.getElementById('course-detail-footer');
+  if (enroll) {
+    footer.innerHTML = `
+      <button class="btn btn-secondary" onclick="Utils.closeModal('course-detail-modal')">Close</button>
+      <button class="btn btn-primary" id="save-progress-btn" data-eid="${Utils.escapeHtml(enroll.id)}">Save Progress</button>
+    `;
+    // Slider live update
+    const slider = document.getElementById('progress-slider');
+    if (slider) {
+      slider.addEventListener('input', function() {
+        document.getElementById('progress-slider-val').textContent  = this.value + '%';
+        document.getElementById('progress-pct-label').textContent   = this.value + '% complete';
+        document.getElementById('modal-progress-bar').style.width   = this.value + '%';
+      });
+    }
+    document.getElementById('save-progress-btn').addEventListener('click', function() {
+      const val  = parseInt(document.getElementById('progress-slider').value, 10);
+      const eId  = this.dataset.eid;
+      const enrolls = DB.get(DB.KEYS.ENROLLMENTS) || [];
+      const idx  = enrolls.findIndex(e => e.id === eId);
+      if (idx !== -1) enrolls[idx].progress = val;
+      DB.set(DB.KEYS.ENROLLMENTS, enrolls);
+      Utils.closeModal('course-detail-modal');
+      Utils.showToast('Progress saved!', 'success');
+      navigateTo('courses');
+    });
+  } else {
+    footer.innerHTML = `
+      <button class="btn btn-secondary" onclick="Utils.closeModal('course-detail-modal')">Close</button>
+      <button class="btn btn-primary" id="modal-enroll-btn" data-cid="${Utils.escapeHtml(course.id)}">Enroll Now</button>
+    `;
+    document.getElementById('modal-enroll-btn').addEventListener('click', function() {
+      Utils.closeModal('course-detail-modal');
+      enrollCourse(this.dataset.cid);
+    });
+  }
+
+  Utils.openModal('course-detail-modal');
+}
+
+/* ===== My Grades ===== */
+function renderGrades() {
+  const grades  = (DB.get(DB.KEYS.GRADES) || []).filter(g => g.studentId === session.userId);
+  const courses = DB.get(DB.KEYS.COURSES) || [];
+  const enrolls = myEnrollments();
+
+  return `
+  <div class="section-header"><h2 class="section-title">My Grades</h2></div>
+  <div class="card">
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Course</th><th>Progress</th><th>Grade</th><th>Score</th><th>Graded On</th></tr></thead>
+        <tbody>
+          ${enrolls.length ? enrolls.map(e => {
+            const c = courses.find(x => x.id === e.courseId);
+            const g = grades.find(x => x.courseId === e.courseId);
+            return `<tr>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <div style="width:8px;height:8px;border-radius:50%;background:${Utils.escapeHtml(c?.color||'#ccc')};flex-shrink:0;"></div>
+                  ${Utils.escapeHtml(c?.title||'—')}
+                </div>
+              </td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px;min-width:100px;">
+                  <div class="progress-wrap" style="flex:1"><div class="progress-bar" style="width:${e.progress}%;background:${Utils.escapeHtml(c?.color||'var(--primary)')}"></div></div>
+                  <span style="font-size:12px;color:var(--text-muted)">${e.progress}%</span>
+                </div>
+              </td>
+              <td>${g ? `<span class="badge badge-success">${Utils.escapeHtml(g.grade)}</span>` : '<span class="badge badge-secondary">Pending</span>'}</td>
+              <td>${g ? g.score : '—'}</td>
+              <td>${g ? Utils.formatDate(g.gradedAt) : '—'}</td>
+            </tr>`;
+          }).join('') : '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:40px">No courses enrolled.</td></tr>'}
+        </tbody>
+      </table>
+    </div>
+  </div>`;
+}
+
+/* ===== Announcements ===== */
+function renderAnnouncements() {
+  const anns = [...(DB.get(DB.KEYS.ANNOUNCEMENTS) || [])].reverse();
+  return `
+  <div class="section-header"><h2 class="section-title">Announcements</h2></div>
+  <div style="display:flex;flex-direction:column;gap:12px;">
+    ${anns.length ? anns.map(a => `
+      <div class="card">
+        <div class="card-header">
+          <span>${Utils.escapeHtml(a.title)}</span>
+          <span style="font-size:12px;color:var(--text-muted)">${Utils.formatDate(a.createdAt)} · ${Utils.escapeHtml(a.author||'Admin')}</span>
+        </div>
+        <div class="card-body" style="color:var(--text-muted)">${Utils.escapeHtml(a.body)}</div>
+      </div>
+    `).join('') : `
+      <div class="card card-body empty-state">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <h3>No announcements</h3><p>Nothing to show right now.</p>
+      </div>`}
+  </div>`;
+}
+
+/* ===== Init ===== */
+navigateTo('dashboard');
+</script>
+</body>
+</html>
