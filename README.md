@@ -70,9 +70,77 @@ Select the **Student** tab on the login page and sign in with:
 
 ---
 
+## 🐍 Python Content Manager (`cms_manager.py`)
+
+A command-line tool that lets you **control all website content from Python** — no browser required.  
+It reads and writes `data/cms_data.json` and can push changes back into `js/app.js` for the next browser session.
+
+### Requirements
+
+Python 3.8+ — only the standard library is used (no `pip install` needed).
+
+### Quick start
+
+```bash
+# Start the local server and open the CMS in your browser
+python3 cms_manager.py serve
+
+# or on a custom port
+python3 cms_manager.py serve --port 3000
+```
+
+### Content commands
+
+| Command | Actions | Description |
+|---|---|---|
+| `python3 cms_manager.py courses` | `list` `add` `edit` `delete` | Manage courses |
+| `python3 cms_manager.py students` | `list` `add` `delete` | Manage student accounts |
+| `python3 cms_manager.py announcements` | `list` `add` `edit` `delete` | Manage announcements |
+| `python3 cms_manager.py enrollments` | `list` `add` `delete` | Manage enrollments |
+| `python3 cms_manager.py grades` | `list` `set` `delete` | Assign / update grades |
+
+### Utility commands
+
+```bash
+# Push data/cms_data.json → js/app.js (so changes appear on next browser load)
+python3 cms_manager.py export
+
+# Restore data/cms_data.json to the default seed content
+python3 cms_manager.py reset
+```
+
+### Example workflow
+
+```bash
+# 1. Add a new course
+python3 cms_manager.py courses add
+
+# 2. Add a new student
+python3 cms_manager.py students add
+
+# 3. Enroll the student in the course
+python3 cms_manager.py enrollments add
+
+# 4. Assign a grade
+python3 cms_manager.py grades set
+
+# 5. Export the changes so the browser picks them up
+python3 cms_manager.py export
+
+# 6. Open the site
+python3 cms_manager.py serve
+```
+
+> **Tip:** After running `export`, clear your browser's `localStorage` (DevTools → Application → Storage → Clear site data) so the updated seed is loaded on the next visit.
+
+---
+
 ## 📁 Project Structure
 
 ```
+cms_manager.py      ← Python CLI — controls all CMS content
+data/
+  cms_data.json     ← Persistent content store (source of truth for the CLI)
 index.html          ← Login / role selector
 admin/
   index.html        ← Admin panel (SPA)

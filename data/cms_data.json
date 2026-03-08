@@ -1,0 +1,117 @@
+{
+  "users": [
+    {
+      "id": "u1",
+      "name": "Admin User",
+      "email": "admin@cms.dev",
+      "password": "admin123",
+      "role": "admin",
+      "createdAt": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "u2",
+      "name": "Alice Johnson",
+      "email": "alice@cms.dev",
+      "password": "student123",
+      "role": "student",
+      "createdAt": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "u3",
+      "name": "Bob Smith",
+      "email": "bob@cms.dev",
+      "password": "student123",
+      "role": "student",
+      "createdAt": "2025-01-01T00:00:00.000Z"
+    }
+  ],
+  "courses": [
+    {
+      "id": "c1",
+      "title": "Introduction to Web Development",
+      "category": "Technology",
+      "description": "Learn the fundamentals of HTML, CSS, and JavaScript to build modern websites.",
+      "instructor": "Admin User",
+      "status": "published",
+      "color": "#1f6feb",
+      "createdAt": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "c2",
+      "title": "Data Science Fundamentals",
+      "category": "Data Science",
+      "description": "A comprehensive introduction to data analysis, visualization, and machine learning basics.",
+      "instructor": "Admin User",
+      "status": "published",
+      "color": "#6e40c9",
+      "createdAt": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "c3",
+      "title": "Business Communication",
+      "category": "Business",
+      "description": "Develop professional communication skills for the modern workplace.",
+      "instructor": "Admin User",
+      "status": "draft",
+      "color": "#2da44e",
+      "createdAt": "2025-01-01T00:00:00.000Z"
+    }
+  ],
+  "announcements": [
+    {
+      "id": "a1",
+      "title": "Welcome to the CMS!",
+      "body": "We are excited to have you here. Explore your courses and get started.",
+      "author": "Admin User",
+      "createdAt": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "a2",
+      "title": "Maintenance Window",
+      "body": "Scheduled maintenance on Sunday 10pm–12am. The system may be briefly unavailable.",
+      "author": "Admin User",
+      "createdAt": "2025-01-01T00:00:00.000Z"
+    }
+  ],
+  "enrollments": [
+    {
+      "id": "e1",
+      "studentId": "u2",
+      "courseId": "c1",
+      "enrolledAt": "2025-01-01T00:00:00.000Z",
+      "progress": 60
+    },
+    {
+      "id": "e2",
+      "studentId": "u2",
+      "courseId": "c2",
+      "enrolledAt": "2025-01-01T00:00:00.000Z",
+      "progress": 25
+    },
+    {
+      "id": "e3",
+      "studentId": "u3",
+      "courseId": "c1",
+      "enrolledAt": "2025-01-01T00:00:00.000Z",
+      "progress": 80
+    }
+  ],
+  "grades": [
+    {
+      "id": "g1",
+      "studentId": "u2",
+      "courseId": "c1",
+      "grade": "A",
+      "score": 92,
+      "gradedAt": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "g2",
+      "studentId": "u3",
+      "courseId": "c1",
+      "grade": "B+",
+      "score": 88,
+      "gradedAt": "2025-01-01T00:00:00.000Z"
+    }
+  ]
+}
