@@ -49,6 +49,9 @@
         <span id="demo-text">
           Email: <code>admin@cms.dev</code> &nbsp; Password: <code>admin123</code>
         </span>
+        <button type="button" id="quick-login-btn" class="quick-login-btn">
+          ⚡ Quick Login
+        </button>
       </div>
 
       <!-- Alert area -->
@@ -103,6 +106,20 @@
         document.getElementById('demo-text').innerHTML = DEMO[selectedRole].label;
         clearErrors();
       });
+    });
+
+    // Quick Login – auto-fill and submit the demo credentials
+    document.getElementById('quick-login-btn').addEventListener('click', () => {
+      clearErrors();
+      document.getElementById('email').value    = DEMO[selectedRole].email;
+      document.getElementById('password').value = DEMO[selectedRole].password;
+      const form = document.getElementById('login-form');
+      // requestSubmit() fires validation and submit event; fall back to dispatchEvent for older browsers
+      if (typeof form.requestSubmit === 'function') {
+        form.requestSubmit();
+      } else {
+        form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+      }
     });
 
     // Form submission
