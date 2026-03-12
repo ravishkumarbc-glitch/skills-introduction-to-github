@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CMS – Login</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    .demo-creds {
+      background: #eff6ff;
+      border: 1px solid #93c5fd;
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin-bottom: 20px;
+      font-size: 13px;
+      color: #1d4ed8;
+    }
+    .demo-creds strong { display: block; margin-bottom: 4px; }
+    .demo-creds code {
+      background: #dbeafe;
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-family: monospace;
+    }
+  </style>
+</head>
+<body>
+  <div class="auth-page">
+    <div class="auth-card">
+      <div class="auth-logo">
+        <!-- Graduation cap icon -->
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+          <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+        </svg>
+        <h1>EduCMS</h1>
+        <p>Content Management System</p>
+      </div>
+
+      <!-- Role Selector -->
+      <div class="role-tabs" role="tablist">
+        <button class="role-tab active" data-role="admin"   role="tab" aria-selected="true">Admin</button>
+        <button class="role-tab"        data-role="student" role="tab" aria-selected="false">Student</button>
+      </div>
+
+      <!-- Demo credentials hint -->
+      <div class="demo-creds" id="demo-creds">
+        <strong>Demo credentials</strong>
+        <span id="demo-text">
+          Email: <code>admin@cms.dev</code> &nbsp; Password: <code>admin123</code>
+        </span>
+        <button type="button" id="quick-login-btn" class="quick-login-btn">
+          ⚡ Quick Login
+        </button>
+      </div>
+
+      <!-- Alert area -->
+      <div id="login-alert" style="display:none;"></div>
+
+      <!-- Login Form -->
+      <form id="login-form" novalidate>
+        <div class="form-group">
+          <label for="email">Email address</label>
+          <input type="email" id="email" name="email" placeholder="you@example.com" autocomplete="email" required />
+          <span class="error-msg" id="email-err"></span>
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" placeholder="••••••••" autocomplete="current-password" required />
+          <span class="error-msg" id="password-err"></span>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%; justify-content: center;">
+          Sign in
+        </button>
+      </form>
+
+      <p class="auth-footer">&copy; 2025 EduCMS &bull; All rights reserved</p>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+  <script>
+    const DEMO = {
+      admin:   { email: 'admin@cms.dev',   password: 'admin123',   label: 'Email: <code>admin@cms.dev</code> &nbsp; Password: <code>admin123</code>' },
+      student: { email: 'alice@cms.dev',   password: 'student123', label: 'Email: <code>alice@cms.dev</code> &nbsp; Password: <code>student123</code>' },
+    };
+
+    let selectedRole = 'admin';
+
+    // If already logged in, redirect immediately
+    const session = Auth.getSession();
+    if (session) {
+      window.location.href = session.role === 'admin' ? 'admin/index.html' : 'student/index.html';
+    }
+
+    // Role tab switching
+    document.querySelectorAll('.role-tab').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.role-tab').forEach(b => {
+          b.classList.remove('active');
+          b.setAttribute('aria-selected', 'false');
+        });
+        btn.classList.add('active');
+        btn.setAttribute('aria-selected', 'true');
+        selectedRole = btn.dataset.role;
+        document.getElementById('demo-text').innerHTML = DEMO[selectedRole].label;
+        clearErrors();
+      });
+    });
+
+    // Quick Login – auto-fill and submit the demo credentials
+    document.getElementById('quick-login-btn').addEventListener('click', () => {
+      clearErrors();
+      document.getElementById('email').value    = DEMO[selectedRole].email;
+      document.getElementById('password').value = DEMO[selectedRole].password;
+      const form = document.getElementById('login-form');
+      // requestSubmit() fires validation and submit event; fall back to dispatchEvent for older browsers
+      if (typeof form.requestSubmit === 'function') {
+        form.requestSubmit();
+      } else {
+        form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+      }
+    });
+
+    // Form submission
+    document.getElementById('login-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      clearErrors();
+
+      const email    = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      let valid = true;
+
+      if (!email) {
+        showFieldError('email', 'Email is required.');
+        valid = false;
+      }
+      if (!password) {
+        showFieldError('password', 'Password is required.');
+        valid = false;
+      }
+      if (!valid) return;
+
+      const session = Auth.login(email, password, selectedRole);
+      if (session) {
+        window.location.href = selectedRole === 'admin' ? 'admin/index.html' : 'student/index.html';
+      } else {
+        showAlert('Invalid email or password for the selected role.', 'danger');
+      }
+    });
+
+    function showFieldError(field, msg) {
+      document.getElementById(field).classList.add('input-error');
+      document.getElementById(field + '-err').textContent = msg;
+    }
+
+    function clearErrors() {
+      ['email', 'password'].forEach(f => {
+        document.getElementById(f).classList.remove('input-error');
+        document.getElementById(f + '-err').textContent = '';
+      });
+      const alert = document.getElementById('login-alert');
+      alert.style.display = 'none';
+      alert.textContent = '';
+    }
+
+    function showAlert(msg, type) {
+      const alert = document.getElementById('login-alert');
+      alert.className = `alert alert-${type}`;
+      alert.textContent = msg;
+      alert.style.display = 'block';
+    }
+  </script>
+</body>
+</html>
